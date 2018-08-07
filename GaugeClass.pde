@@ -1,0 +1,161 @@
+/*
+ Gauge Demo developed with Processing 2.2.1
+ Gauge set according to X and Y position of mouse in mouseMoved event.
+ Author:  Darrell Harriman
+ Contact:  harrimand@gmail.com
+*/  
+
+  //Gauge g1 = new Gauge(gx, gy, gSize);
+  Gauge g1 = new Gauge( 200, 200, 200);
+  Gauge g2 = new Gauge( 200, 500, 300);
+  VerticalGauge Vg1 = new VerticalGauge(450, 300, 400);
+  VerticalGauge Vg2 = new VerticalGauge(550, 300, 300);
+
+void setup()
+{
+  background(0);
+  size(650, 600);
+  g1.range(0, width);
+  g2.range(width, 0);
+  Vg1.range(height, 0);
+  Vg2.range(0, height);
+}
+
+void draw()
+{
+
+}
+
+//=================================================
+void mouseMoved()
+{
+  background(0);
+  g1.update(mouseX);
+  g2.update(mouseX);
+  Vg1.update(mouseY);
+  Vg2.update(mouseY);
+}
+
+//======================================================================================================
+class Gauge {
+  int gx, gy, gSize;
+  float minS, maxS, Px, Py;
+  String gMarker[] = {"1/8", "1/4", "3/8", "1/2", "5/8", "3/4", "7/8"};  
+  Gauge (int Xpos, int Ypos, int gWidth)
+  {
+    gx = Xpos;
+    gy = Ypos;
+    gSize = gWidth;
+  }
+  void range(float s0, float s1)
+  {
+    minS = s0;
+    maxS = s1;
+  }
+
+  void update(float gVal)
+  {
+    float angle = map(gVal, minS, maxS, PI, TWO_PI);
+    Px = (gSize / 2 + 6) * cos(angle);
+    Py = (gSize / 2 + 6) * sin(angle);    
+    pushMatrix();  //Store Default Coordinates
+    translate(gx, gy);  //Move Coordinate Reference for Gauge
+    
+    //Draw Gauge Base Line---------------------------
+    stroke(255);
+    line(-gSize / 2, 0, gSize / 2, 0);
+  
+    //Draw Gauge Housing------------------------------
+    stroke(0, 255, 0);
+    ellipseMode(CENTER);
+    strokeWeight(2);
+    fill(60, 60, 60);
+    arc(0, 0, gSize, gSize, PI, TWO_PI);
+    
+    //Draw Gauge Base Hub-----------------------------
+    strokeWeight(4);
+    stroke(0, 255, 0);
+    fill(0, 255, 0);
+    ellipse(0, 0, 15, 15);  
+    
+    //Draw Gauge Markers------------------------------ 
+    strokeWeight(2);  //Marker Thickness
+    rectMode(CENTER);
+    textAlign(CENTER, CENTER);
+    textSize(10);  //Marker Text Size
+    for(int i = 1; i < 8; i ++)
+    { 
+      stroke(255, 255, 0);  //Gauge Marker Color
+      angle = (float(i) / 8.0 + 1) * PI;
+      float px1 = (gSize/2-5) * cos(angle);
+      float py1 = (gSize/2-5) * sin(angle);
+      float px2 = (gSize/2+5) * cos(angle);
+      float py2 = (gSize/2+5) * sin(angle);    
+      line(px1, py1, px2, py2);  //Draw Gauge Markers 
+      fill(0);  //Black rectangle to erase text.
+      noStroke();  //No Borders around rectangles that erase text.
+      rect((gSize/2+20) * cos(angle), (gSize/2+20) * sin(angle), 30, 10); //Erase Text
+      fill(255, 255, 255);  //Marker Text Color
+      text(gMarker[i-1], (gSize/2+20) * cos(angle), (gSize/2+20) * sin(angle));  //Gauge Marker Text
+     }
+
+  //Draw Gauge Needle---------------------------------
+  strokeWeight(3);
+  stroke(255, 0, 0);
+  line(0, 0, Px, Py);  //Draw Gauge Needle
+  popMatrix(); 
+  } 
+}
+//======================================================================================================
+class VerticalGauge {
+    int Sx, Sy;
+    float slideHeight, minS, maxS;
+    String vgMarker[] = {"1/8", "1/4", "3/8", "1/2", "5/8", "3/4", "7/8"};
+    
+    VerticalGauge(int Xpos, int Ypos, int gHeight)
+    {
+      Sx = Xpos;
+      Sy = Ypos;
+      slideHeight = gHeight;    
+    }
+
+  void range(float s0, float s1)
+  {
+    minS = s0;
+    maxS = s1;
+  } 
+  
+  void update(float sVal)
+  {
+    float slideVal = map(sVal, minS, maxS, 0, slideHeight - 5);
+     
+    pushMatrix();
+
+    //Draw Vertical Guage   
+    translate(Sx, Sy);  
+    stroke(128, 255, 128);
+    fill( 60, 60, 60);
+    rectMode(CENTER);  
+    rect( 0, 0, 30, slideHeight);
+  
+    //Draw Markers and Labels
+    textAlign(CENTER, CENTER);
+    textSize(10);  //Marker Text Size
+    fill(255);
+    for(int i = 1; i < 8; i ++)
+    {
+      stroke(255, 255, 0);    
+      float ly = i * slideHeight / 8 - slideHeight / 2; 
+      line(12, ly, 20, ly );
+      stroke(255);
+      text(vgMarker[7-i], 36, ly);
+    }
+  
+    //Draw Gauge Fill
+    float slidePos = slideHeight / 2 - slideVal / 2 - 2;
+    fill(255, 0, 0);  
+    noStroke();
+    rect(1, slidePos, 18, slideVal);
+    popMatrix();  //Restore Default Coordinates
+  }  
+}
