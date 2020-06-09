@@ -133,7 +133,7 @@ class Graph{
   
   void yScale()
   {
-    println(gridDivsH);
+    //println(gridDivsH);
     pushMatrix();
     translate(xPos, yPos);
     pushStyle();
@@ -147,9 +147,9 @@ class Graph{
     {
       int scY = max - y * (max - min)/gridDivsH;
       text(scY, -10, y * (h / gridDivsH)-3);
-      print(y + " ");
+      //print(y + " ");
     }
-    println();
+    //println();
     popStyle();
     popMatrix();
   }
