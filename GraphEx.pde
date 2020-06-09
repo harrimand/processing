@@ -3,16 +3,28 @@ Demonstrate usage of Graph class
 Author:  Darrell Harriman
 Contact:  harrimand@gmail.com
 */
+
+import processing.serial.*;
+Serial ardPort;
+
 Graph Gr1;  //Create Graph Object
 boolean pause = false;
 boolean plotLine = false;
 boolean gridLines = false;
-boolean source = false;
+int source = 2;
 boolean Axis = false;
 int degAngle = 0;  //For test data
+int ardData = 0;
+boolean newData = false;
+String ardDataS = ""; 
 
 void setup()
 {
+  println(Serial.list());
+  String portName = Serial.list()[1];
+  println(portName);
+  ardPort = new Serial(this, portName, 9600);
+  
   size(800, 600);  // Window size (width, height)
   background(0);  //  Window background color
   Gr1 = new Graph(100, 200, 600, 304); //Initialize new Graph (x, y, width, height)
@@ -32,10 +44,26 @@ void setup()
 
 void draw()
 {
-  if(source) Gr1.newData(simData1());  //Add new element of data to buffer.
-  else Gr1.newData(simData2());
+  if(source == 0) Gr1.newData(simData1());  //Add new element of data to buffer.
+  else if(source == 1)  Gr1.newData(simData2());
+  else if(newData){
+    Gr1.newData(ardData);
+    newData = false;
+  }
   Gr1.plot(); //Update graph with current data.
   delay(4);  //Control simulation speed.  Smaller is faster.
+}
+
+void serialEvent(Serial ardPort){
+  //ardData = int(ardPort.readStringUntil('\n'));
+  //while(ardPort.available()>0)
+  //ardData = int(ardPort.read());
+  ardDataS = ardPort.readStringUntil('\n');
+  if(ardDataS != null){
+      //println(ardDataS);
+      ardData = int(trim(ardDataS));
+      newData = true;
+  }
 }
 
 int simData1()
@@ -60,7 +88,8 @@ int simData2()
 void printKeys()
 {
   println("keyboard functions:");
-  println("b = blue background | g = green background | w = white background");
+  println("b = blue background | g = green background");
+  println("k = black background | w = white background");
   println("R = red plot | G = green plot | W = white plot");
   println("r = red border | y = yellow border");
   println("p = toggle draw lines between points");
@@ -86,6 +115,9 @@ void keyPressed()
     case 'g':
       Gr1.bgColor(0, 48, 0);  //  g = Green Background
       break;
+    case 'k':
+      Gr1.bgColor(0, 0, 0);  //  g = Green Background
+      break;  
     case 'l':
       gridLines = !gridLines;
       Gr1.showGrid(gridLines);
@@ -98,7 +130,7 @@ void keyPressed()
       Gr1.borderColor(255, 0, 0);  //  r = Red Border
       break;
     case 's':                      // s = Toggle Source
-      source = !source;
+      source = (source + 1) % 3;
       break;
     case 'w':
       Gr1.bgColor(224, 224, 224);  //  w = White Background
@@ -123,10 +155,3 @@ void keyPressed()
       break;
   }
 }
-    
-    
-    
-    
-    
-
-
