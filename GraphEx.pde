@@ -40,6 +40,8 @@ void setup()
   textSize(18);
   text("Graph Demo", width/2, 40);
   printKeys();
+  println("min: ", Gr1.min);
+  println("max: ", Gr1.max);
 }
 
 void draw()
@@ -47,6 +49,7 @@ void draw()
   if(source == 0) Gr1.newData(simData1());  //Add new element of data to buffer.
   else if(source == 1)  Gr1.newData(simData2());
   else if(newData){
+    //Gr1.newData(ardData * 0.00645);
     Gr1.newData(ardData);
     newData = false;
   }
@@ -69,7 +72,7 @@ void serialEvent(Serial ardPort){
 int simData1()
 {
   //Generate Random Data between min and max of yRange
-  return int(random(0, 1023));
+  return int(random(Gr1.min, Gr1.max));
 }
 
 int simData2()
@@ -82,7 +85,8 @@ int simData2()
     p1 += sin(radians(7 * degAngle))/7;
     degAngle = (degAngle + 2) % 360;
     //if(degAngle > 45 && degAngle < 135) return 1024;  //'Out Of Range' data test   
-    return int(512 * p1 + 511); 
+    //return int(512 * p1 + 511);
+    return int((Gr1.max - Gr1.min) / 2 * p1 + ((Gr1.max - Gr1.min)/2));
 }
 
 void printKeys()
