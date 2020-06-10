@@ -165,7 +165,7 @@ class Graph{
     }  
 */
     
-  void newData(int sample)
+  void newData(float sample)
   {
     if(sample < min || sample > max)  // Data Out of Range ?
     {
